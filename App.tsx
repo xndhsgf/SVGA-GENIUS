@@ -97,22 +97,23 @@ const App: React.FC = () => {
     setShowAdminPanel(false);
   }, []);
 
+  // شرط المدير العام (Super Admin)
+  const isSuperAdmin = currentUser?.email.toLowerCase() === "ceo@svga-genius.com";
+
   if (state === AppState.LOGIN) {
     return (
       <div className="flex flex-col lg:flex-row h-screen bg-[#020617] overflow-hidden">
         <div className="hidden lg:flex flex-1 flex-col items-center justify-center relative p-20 border-r border-white/5">
           <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-sky-500/10 blur-[150px] rounded-full animate-pulse"></div>
           <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 blur-[150px] rounded-full"></div>
-          
           <div className="relative z-10 text-center">
-            <div className="w-32 h-32 bg-gradient-to-br from-sky-400 to-indigo-600 rounded-[2.5rem] flex items-center justify-center shadow-3xl mx-auto mb-10 transform -rotate-12 hover:rotate-0 transition-transform duration-700">
+            <div className="w-32 h-32 bg-gradient-to-br from-sky-400 to-indigo-600 rounded-[2.5rem] flex items-center justify-center shadow-3xl mx-auto mb-10 transform -rotate-12">
                <span className="text-white text-6xl font-black italic">S</span>
             </div>
             <h1 className="text-6xl font-black text-white tracking-tighter mb-4">SVGA <span className="text-sky-400">GENIUS</span></h1>
             <p className="text-slate-500 font-bold uppercase tracking-[0.5em] text-xs">The Quantum Animation Processor</p>
           </div>
         </div>
-        
         <div className="w-full lg:w-[480px] h-full shadow-3xl z-50 overflow-y-auto">
           <Login onLogin={handleLogin} />
         </div>
@@ -124,7 +125,7 @@ const App: React.FC = () => {
     <div className="min-h-screen bg-[#020617] text-slate-200 overflow-x-hidden relative">
       <Header 
         onLogoClick={handleReset} 
-        isAdmin={currentUser?.role === 'admin'} 
+        isAdmin={isSuperAdmin} 
         userName={currentUser?.name}
         onAdminToggle={() => setShowAdminPanel(!showAdminPanel)}
         onLogout={handleLogout}
@@ -139,29 +140,24 @@ const App: React.FC = () => {
                 <Uploader onUpload={handleFileUpload} isUploading={false} />
               </div>
             )}
-
             {state === AppState.PROCESSING && fileMetadata && (
               <Workspace metadata={fileMetadata} onCancel={handleReset} />
             )}
           </div>
-          
-          <footer className="border-t border-white/5 py-8 text-center mt-10 sm:mt-20">
-            <p className="text-[8px] sm:text-[9px] text-slate-700 font-black uppercase tracking-[0.4em]">SVGA GENIUS • WORKSPACE ISOLATION ACTIVE</p>
-          </footer>
         </main>
 
         <aside 
           className={`fixed top-0 lg:top-20 right-0 bottom-0 w-full lg:w-[450px] bg-[#020617]/95 lg:bg-slate-900/90 backdrop-blur-3xl border-l border-white/10 z-[200] lg:z-[110] transition-transform duration-500 shadow-3xl overflow-y-auto ${showAdminPanel ? 'translate-x-0' : 'translate-x-full'}`}
         >
           <div className="p-6 sm:p-8 pt-24 lg:pt-8">
-            <div className="flex justify-between items-center mb-8 sm:mb-10">
+            <div className="flex justify-between items-center mb-10">
               <button 
                  onClick={() => setShowAdminPanel(false)}
-                 className="w-12 h-12 lg:w-10 lg:h-10 bg-white/5 hover:bg-red-500/20 text-white rounded-2xl lg:rounded-xl flex items-center justify-center transition-all group border border-white/10"
+                 className="w-10 h-10 bg-white/5 hover:bg-red-500/20 text-white rounded-xl flex items-center justify-center transition-all group border border-white/10"
                >
-                 <svg className="w-6 h-6 lg:w-5 lg:h-5 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+                 <svg className="w-5 h-5 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                </button>
-               <h3 className="text-white font-black uppercase text-xs sm:text-sm tracking-widest">Master Control</h3>
+               <h3 className="text-white font-black uppercase text-xs tracking-widest">Director Master Control</h3>
             </div>
             <AdminPanel />
           </div>
@@ -171,8 +167,6 @@ const App: React.FC = () => {
       <style>{`
         .shadow-3xl { box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        @media (min-width: 640px) { .custom-scrollbar::-webkit-scrollbar { width: 6px; } }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.1); border-radius: 30px; }
       `}</style>
     </div>
