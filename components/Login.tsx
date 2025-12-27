@@ -15,9 +15,6 @@ import {
 } from 'firebase/firestore';
 import { UserRecord } from '../types';
 
-const MASTER_ADMIN_EMAIL = "admin@genius.com";
-const MASTER_ADMIN_PASSWORD = "admin123";
-
 interface LoginProps {
   onLogin: (user: UserRecord) => void;
 }
@@ -47,16 +44,14 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const q = query(usersRef, where("email", "==", userEmail.toLowerCase()), limit(1));
     const querySnapshot = await getDocs(q);
 
-    const isMaster = userEmail.toLowerCase() === MASTER_ADMIN_EMAIL;
-
     if (querySnapshot.empty) {
       const allUsersSnapshot = await getDocs(query(collection(db, "users"), limit(1)));
-      const isFirstUser = allUsersSnapshot.empty || isMaster;
+      const isFirstUser = allUsersSnapshot.empty;
 
       const newUser = {
-        name: isMaster ? "Master Admin" : (name || userEmail.split('@')[0]),
+        name: name || userEmail.split('@')[0],
         email: userEmail.toLowerCase(),
-        password: password || MASTER_ADMIN_PASSWORD, 
+        password: password,
         role: isFirstUser ? 'admin' : 'user',
         isApproved: isFirstUser,
         status: isFirstUser ? 'active' : 'pending',
@@ -70,13 +65,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
       const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data() as UserRecord;
       
-      if (isMaster && userData.role !== 'admin') {
-         await updateDoc(userDoc.ref, { role: 'admin', isApproved: true, status: 'active' });
-         userData.role = 'admin';
-         userData.isApproved = true;
-         userData.status = 'active';
-      }
-
       await updateDoc(userDoc.ref, { lastLogin: serverTimestamp() });
       return { id: userDoc.id, ...userData };
     }
@@ -110,14 +98,6 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setSuccessMessage(null);
 
     try {
-      if (email.toLowerCase() === MASTER_ADMIN_EMAIL && password === MASTER_ADMIN_PASSWORD) {
-         const user = await fetchAndCheckUser(email);
-         if (user) {
-           handleAuthResult(user);
-           return;
-         }
-      }
-
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("email", "==", email.toLowerCase()), limit(1));
       const querySnapshot = await getDocs(q);
