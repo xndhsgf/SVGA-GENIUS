@@ -98,7 +98,7 @@ const App: React.FC = () => {
   }, []);
 
   // شرط المدير العام (Super Admin)
-  const isSuperAdmin = currentUser?.email.toLowerCase() === "ceo@svga-genius.com";
+  const isSuperAdmin = currentUser?.role === 'admin';
 
   if (state === AppState.LOGIN) {
     return (
